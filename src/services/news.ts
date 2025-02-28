@@ -1,33 +1,27 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { GuardianType, NewsAPIType, NYTAPIType } from '../types'
-
-const NEWS_API = process.env.REACT_APP_NEWS_API;
-const NEWS_API_BASE_URL = `https://newsapi.org/v2/`;
-
-
-const GUARDIAN_API = process.env.REACT_APP_GUARDIAN_API;
-const GUARDIAN_BASE_URL = `https://content.guardianapis.com/`;
-
-const NYT_API = process.env.REACT_APP_NYT_API;
-const NYT_BASE_URL = `https://api.nytimes.com/svc/search/v2/`
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { GuardianType, NewsAPIType, NYTAPIType } from "../types";
+import { FiltersState } from "../store/filtersSlice";
+import { buildAPIQuery } from "../utils";
 
 export const newsAPI = createApi({
-  reducerPath: 'newsAPI',
-  baseQuery: fetchBaseQuery({ baseUrl: '' }), // We will override the base URL for each endpoint
+  reducerPath: "newsAPI",
+  baseQuery: fetchBaseQuery({ baseUrl: "" }), // We will override the base URL for each endpoint
   endpoints: (builder) => ({
-    getFromNewsAPI: builder.query<NewsAPIType, string>({
+    getFromNewsAPI: builder.query<NewsAPIType, FiltersState >({
+      query: (query) => {
+        return {
+          url:buildAPIQuery(query, "newsAPI"),
+        };
+      },
+    }),
+    getFromGuardianAPI: builder.query<GuardianType, FiltersState>({
       query: (query) => ({
-        url: `${NEWS_API_BASE_URL}everything?q=${query}&apiKey=${NEWS_API}`,
+        url: buildAPIQuery(query, "guardian"),
       }),
     }),
-    getFromGuardianAPI: builder.query<GuardianType, string>({
+    getFromNYTAPI: builder.query<NYTAPIType, FiltersState>({
       query: (query) => ({
-        url: `${GUARDIAN_BASE_URL}search?q=${query}&api-key=${GUARDIAN_API}`,
-      }),
-    }),
-    getFromNYTAPI: builder.query<NYTAPIType, string>({
-      query: (query) => ({
-        url: `${NYT_BASE_URL}articlesearch.json?q=${query}&api-key=${NYT_API}`,
+        url: buildAPIQuery(query, "nyt"),
       }),
     }),
   }),
