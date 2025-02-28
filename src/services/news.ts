@@ -13,36 +13,29 @@ const NYT_BASE_URL = `https://api.nytimes.com/svc/search/v2/`
 
 export const newsAPI = createApi({
   reducerPath: 'newsAPI',
-  baseQuery: fetchBaseQuery({ baseUrl:NEWS_API_BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: '' }), // We will override the base URL for each endpoint
   endpoints: (builder) => ({
     getFromNewsAPI: builder.query<NewsAPIType, string>({
-      query: (query) => `everything?apiKey=${NEWS_API}&q=${query}`,
+      query: (query) => ({
+        url: `${NEWS_API_BASE_URL}everything?q=${query}&apiKey=${NEWS_API}`,
+      }),
     }),
-  }),
-})
-
-export const guardianAPI = createApi({
-  reducerPath: 'guardianAPI',
-  baseQuery: fetchBaseQuery({ baseUrl:GUARDIAN_BASE_URL }),
-  endpoints: (builder) => ({
     getFromGuardianAPI: builder.query<GuardianType, string>({
-      query: (query) => `search?api-key=${GUARDIAN_API}&q=${query}`,
+      query: (query) => ({
+        url: `${GUARDIAN_BASE_URL}search?q=${query}&api-key=${GUARDIAN_API}`,
+      }),
     }),
-  }),
-})
-
-export const nytAPI = createApi({
-  reducerPath: 'nytAPI',
-  baseQuery: fetchBaseQuery({ baseUrl:NYT_BASE_URL}),
-  endpoints: (builder) => ({
     getFromNYTAPI: builder.query<NYTAPIType, string>({
-      query: (query) => `articlesearch.json?api-key=${NYT_API}&q=${query}`,
+      query: (query) => ({
+        url: `${NYT_BASE_URL}articlesearch.json?q=${query}&api-key=${NYT_API}`,
+      }),
     }),
   }),
-})
+});
 
-
-
-export const { useGetFromNewsAPIQuery } = newsAPI;
-export const { useGetFromGuardianAPIQuery } = guardianAPI;
-export const { useGetFromNYTAPIQuery } = nytAPI;
+// Export Hooks
+export const {
+  useGetFromNewsAPIQuery,
+  useGetFromGuardianAPIQuery,
+  useGetFromNYTAPIQuery,
+} = newsAPI;
