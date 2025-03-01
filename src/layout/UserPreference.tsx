@@ -24,7 +24,7 @@ const UserPreference = () => {
   const handleAddition = (tag: Tag, type: "authors" | "categories" | "sources") => {
     if (type === "authors") dispatch(addAuthor(tag.text));
     if (type === "categories") dispatch(addCategory(tag.text));
-    if (type === "sources") dispatch(addSource(tag.text));
+    if (type === "sources") dispatch(addSource(tag.id));
   };
 
   return (

@@ -54,7 +54,7 @@ const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
 
   const isUserOrFilteredSources = useCallback((type: string) => {
     if (isForYouPage && userPreferences.sources.length) {
-      console.log(userPreferences.sources, type);
+
       return userPreferences.sources.includes(type);
     } else {
       return filters.sources.includes(type);
@@ -64,9 +64,9 @@ const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
   // Combine all news data
   const allNews: News[] = useMemo(() => {
 
-    const newsFromAPI = isUserOrFilteredSources("News API") && newsAPIData ? structureNewsData(newsAPIData) : [];
-    const newsFromGuardian = isUserOrFilteredSources("Guardian") && guardianData ? structureNewsData(guardianData) : [];
-    const newsFromNYT = isUserOrFilteredSources("New York Times") && nytData ? structureNewsData(nytData) : [];
+    const newsFromAPI = isUserOrFilteredSources("newsAPI") && newsAPIData ? structureNewsData(newsAPIData) : [];
+    const newsFromGuardian = isUserOrFilteredSources("guardian") && guardianData ? structureNewsData(guardianData) : [];
+    const newsFromNYT = isUserOrFilteredSources("nyt") && nytData ? structureNewsData(nytData) : [];
 
     return [...newsFromAPI, ...newsFromGuardian, ...newsFromNYT];
   }, [newsAPIData, guardianData, nytData, isUserOrFilteredSources]);
