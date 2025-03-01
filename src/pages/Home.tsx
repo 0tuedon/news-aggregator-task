@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import ArticleList from "../components/ArticleList";
 import {
+  NewsQuery,
   useGetFromGuardianAPIQuery,
   useGetFromNewsAPIQuery,
   useGetFromNYTAPIQuery,
@@ -8,59 +9,76 @@ import {
 import { News } from "../types";
 
 import { debounce, structureNewsData } from "../utils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
-import { FiltersState } from "../store/filtersSlice";
+import { FiltersState, setPersonalized } from "../store/filtersSlice";
+import { initialPreferenceState } from "../store/userPreferenceSlice";
 
-const initialQuery: FiltersState = {
-  keyword: "",
-  category: "",
-  sources: ["newsAPI", "guardian", "nyt"],
-  dateFrom: "",
-  dateTo: "",
+const initialQuery: NewsQuery = {
+  query: {
+    keyword: "",
+    category: "",
+    sources: ["newsAPI", "guardian", "nyt"],
+    dateFrom: "",
+    dateTo: "",
+  },
+  userPreferences: initialPreferenceState,
 };
-const HomePage = () => {
+
+const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
+  const dispatch = useDispatch();
   const filters = useSelector((state: RootState) => state.filters);
+  const userPreferences = useSelector((state: RootState) => state.userPreferences); // Use selector to get user preferences directly
+  const [currentQuery, setCurrentQuery] = useState<NewsQuery>({ ...initialQuery });
 
-  const [currentQuery, setCurrentQuery] = useState<FiltersState>(initialQuery);
-  const { data: newsAPIData, isLoading: loadingNewsAPI } =
-    useGetFromNewsAPIQuery(currentQuery);
-  const { data: guardianData, isLoading: loadingGuardian } =
-    useGetFromGuardianAPIQuery(currentQuery);
-  const { data: nytData, isLoading: loadingNYT } =
-    useGetFromNYTAPIQuery(currentQuery);
+  const { data: newsAPIData, isLoading: loadingNewsAPI } = useGetFromNewsAPIQuery(currentQuery);
+  const { data: guardianData, isLoading: loadingGuardian } = useGetFromGuardianAPIQuery(currentQuery);
+  const { data: nytData, isLoading: loadingNYT } = useGetFromNYTAPIQuery(currentQuery);
 
+  // Debounced query update
   const debouncedQueryUpdate = useCallback(
     debounce((newQuery: FiltersState) => {
-      setCurrentQuery(newQuery);
+      setCurrentQuery({ query: newQuery, userPreferences });
     }, 1000),
-    []
+    [userPreferences]
   );
 
+  // Update current query whenever filters change
   useEffect(() => {
     debouncedQueryUpdate(filters);
   }, [filters, debouncedQueryUpdate]);
-  
-  // Memoize the combined news data to avoid unnecessary re-renders
+
+  // helper function for condition check
+  const isForYouPage = typeof window !== "undefined" && window.location.pathname ===
+    "/for-you";
+
+  const isUserOrFilteredSources = useCallback((type: string) => {
+    if (isForYouPage && userPreferences.sources.length) {
+      console.log(userPreferences.sources, type);
+      return userPreferences.sources.includes(type);
+    } else {
+      return filters.sources.includes(type);
+    }
+  }, [isForYouPage, userPreferences.sources, filters.sources]);
+
+  // Combine all news data
   const allNews: News[] = useMemo(() => {
-    const newsFromAPI = (filters.sources.includes("newsAPI") && newsAPIData) ? structureNewsData(newsAPIData) : [];
-    const newsFromGuardian =(filters.sources.includes("guardian") && guardianData)
-      ? structureNewsData(guardianData)
-      : [];
-    const newsFromNYT = (filters.sources.includes("nyt") && nytData) ? structureNewsData(nytData) : [];
+
+    const newsFromAPI = isUserOrFilteredSources("News API") && newsAPIData ? structureNewsData(newsAPIData) : [];
+    const newsFromGuardian = isUserOrFilteredSources("Guardian") && guardianData ? structureNewsData(guardianData) : [];
+    const newsFromNYT = isUserOrFilteredSources("New York Times") && nytData ? structureNewsData(nytData) : [];
 
     return [...newsFromAPI, ...newsFromGuardian, ...newsFromNYT];
-  }, [newsAPIData, guardianData, nytData, filters.sources]);
+  }, [newsAPIData, guardianData, nytData, isUserOrFilteredSources]);
 
+  // Set personalized filters
   useEffect(() => {
-    debounce(() => {
-      setCurrentQuery(filters);
-    }, 1000);
-
-    return () => {
-      setCurrentQuery(initialQuery);
-    };
-  }, [filters]);
+    if (isPersonalized) {
+      dispatch(setPersonalized(true));
+    } else {
+      dispatch(setPersonalized(false));
+    }
+  }, [isPersonalized, dispatch]);
 
   if (loadingNewsAPI || loadingGuardian || loadingNYT) return <p>Loading...</p>;
 
