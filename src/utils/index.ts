@@ -1,8 +1,11 @@
 import { FiltersState } from "../store/filtersSlice";
 import { GuardianType, NewsAPIType, NYTAPIType } from "../types";
 import { News } from "../types/news";
+import { categoryMapping } from "./data";
 
-export function structureNewsData(news: NewsAPIType | GuardianType | NYTAPIType): News[] {
+export function structureNewsData(
+  news: NewsAPIType | GuardianType | NYTAPIType
+): News[] {
   const defaultImage = "/images/default-news.jpg";
   // News API
   if ("articles" in news) {
@@ -30,7 +33,7 @@ export function structureNewsData(news: NewsAPIType | GuardianType | NYTAPIType)
         ? `https://www.nytimes.com/${article.multimedia[0].url}`
         : defaultImage,
     }));
-     // The Guardian API
+    // The Guardian API
   } else if ("response" in news && "results" in news.response) {
     return news.response.results.map((article) => ({
       title: article.webTitle,
@@ -58,7 +61,6 @@ export function debounce<T extends (...args: any[]) => void>(
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       func(...args);
-
     }, delay);
   };
 }
@@ -72,49 +74,69 @@ const GUARDIAN_BASE_URL = `https://content.guardianapis.com/`;
 const NYT_API = process.env.REACT_APP_NYT_API;
 const NYT_BASE_URL = `https://api.nytimes.com/svc/search/v2/`;
 
-export const buildAPIQuery = (query: FiltersState, source: "newsAPI" | "guardian" | "nyt"): string => {
-    let baseURL = "";
-    let apiKey = "";
-    let url = "";
+export const buildAPIQuery = (
+  query: FiltersState,
+  source: "newsAPI" | "guardian" | "nyt"
+): string => {
+  let baseURL = "";
+  let apiKey = "";
+  let url = "";
 
-    switch (source) {
-        case "newsAPI":
-            baseURL = NEWS_API_BASE_URL;
-            apiKey = `apiKey=${NEWS_API}`;
-            url = `${baseURL}top-headlines?country=us&${apiKey}`;
+  // Get the mapped category
+  const mappedCategory = query.category
+    ? categoryMapping[query.category as keyof typeof categoryMapping]?.[source]
+    : null;
 
-            if (query.dateFrom) url += `&from=${query.dateFrom}`;
-            if (query.dateTo) url += `&to=${query.dateTo}`;
+  switch (source) {
+    case "newsAPI":
+      baseURL = NEWS_API_BASE_URL;
+      apiKey = `apiKey=${NEWS_API}`;
+      url = `${baseURL}top-headlines?country=us&${apiKey}`;
 
-            if (query.category) {
-                url += `&category=${query.category}`;
-            } else if (query.keyword) {
-                url = `${baseURL}everything?q=${encodeURIComponent(query.keyword)}&${apiKey}`;
-                if (query.dateFrom) url += `&from=${query.dateFrom}`;
-                if (query.dateTo) url += `&to=${query.dateTo}`;
-            }
-            break;
+      if (query.dateFrom) url += `&from=${query.dateFrom}`;
+      if (query.dateTo) url += `&to=${query.dateTo}`;
 
-        case "guardian":
-            baseURL = GUARDIAN_BASE_URL;
-            apiKey = `api-key=${GUARDIAN_API}`;
-            url = `${baseURL}search?${apiKey}`;
+      if (query.category === "") url += ``;
+      if (mappedCategory) url += `&category=${mappedCategory}`;
 
-            if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
-            if (query.dateFrom) url += `&from-date=${query.dateFrom}`;
-            if (query.dateTo) url += `&to-date=${query.dateTo}`;
-            break;
+      if (query.keyword) {
+        url = `${baseURL}everything?q=${encodeURIComponent(
+          query.keyword
+        )}&${apiKey}`;
+        
+        if (query.dateFrom) url += `&from=${query.dateFrom}`;
+        if (query.dateTo) url += `&to=${query.dateTo}`;
+      }
+      break;
 
-        case "nyt":
-            baseURL = NYT_BASE_URL;
-            apiKey = `api-key=${NYT_API}`;
-            url = `${baseURL}articlesearch.json?${apiKey}`;
+    case "guardian":
+      baseURL = GUARDIAN_BASE_URL;
+      apiKey = `api-key=${GUARDIAN_API}`;
+      url = `${baseURL}search?${apiKey}`;
 
-            if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
-            if (query.dateFrom) url += `&begin_date=${query.dateFrom.replace(/-/g, '')}`;
-            if (query.dateTo) url += `&end_date=${query.dateTo.replace(/-/g, '')}`;
-            break;
-    }
+      if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
+      if (query.dateFrom) url += `&from-date=${query.dateFrom}`;
+      if (query.dateTo) url += `&to-date=${query.dateTo}`;
+      if (query.category === "") url += ``;
+      if (mappedCategory)
+        url += `&section=${encodeURIComponent(mappedCategory)}`;
+      break;
 
-    return url;
+    case "nyt":
+      baseURL = NYT_BASE_URL;
+      apiKey = `api-key=${NYT_API}`;
+      url = `${baseURL}articlesearch.json?${apiKey}`;
+
+      if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
+      if (query.dateFrom)
+        url += `&begin_date=${query.dateFrom.replace(/-/g, "")}`;
+      if (query.dateTo) url += `&end_date=${query.dateTo.replace(/-/g, "")}`;
+      if (query.category === "") url += ``;
+
+      if (mappedCategory)
+        url += `&fq=section_name:(${encodeURIComponent(mappedCategory)})`;
+      break;
+  }
+
+  return url;
 };

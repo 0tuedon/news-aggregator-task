@@ -5,10 +5,11 @@ import { buildAPIQuery } from "../utils";
 
 export const newsAPI = createApi({
   reducerPath: "newsAPI",
-  baseQuery: fetchBaseQuery({ baseUrl: "" }), // We will override the base URL for each endpoint
+  baseQuery: fetchBaseQuery({ baseUrl: "" }), // will override the base URL for each endpoint
   endpoints: (builder) => ({
     getFromNewsAPI: builder.query<NewsAPIType, FiltersState >({
       query: (query) => {
+        
         return {
           url:buildAPIQuery(query, "newsAPI"),
         };

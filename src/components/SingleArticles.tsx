@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { News } from "../types";
 import { formatDistance } from "date-fns";
 
@@ -14,10 +14,16 @@ const SingleArticles: FC<News> = (props) => {
     url,
   } = props;
   let formattedDate = formatDistance(new Date(publishedAt), new Date());
+  const [imageSrc, setImageSrc] = useState(imgLink);
+
+  const handleError = () => {
+      setImageSrc("/images/default-image.jpg");
+  };
+
   return (
     <a target="_blank" rel="noreferrer" href={url} className="article">
       <div className="article-body">
-        <img className="article-body-image" src={imgLink} alt={title} />
+        <img className="article-body-image" src={imageSrc} alt={title} onError={handleError} />
         <div className="article-body-content">
           <h3 className="article-body-content__heading">{title}</h3>
           <p className="article-body-content__description">{description}</p>

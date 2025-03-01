@@ -15,7 +15,7 @@ import { FiltersState } from "../store/filtersSlice";
 const initialQuery: FiltersState = {
   keyword: "",
   category: "",
-  source: "",
+  sources: ["newsAPI", "guardian", "nyt"],
   dateFrom: "",
   dateTo: "",
 };
@@ -43,14 +43,14 @@ const HomePage = () => {
   
   // Memoize the combined news data to avoid unnecessary re-renders
   const allNews: News[] = useMemo(() => {
-    const newsFromAPI = newsAPIData ? structureNewsData(newsAPIData) : [];
-    const newsFromGuardian = guardianData
+    const newsFromAPI = (filters.sources.includes("newsAPI") && newsAPIData) ? structureNewsData(newsAPIData) : [];
+    const newsFromGuardian =(filters.sources.includes("guardian") && guardianData)
       ? structureNewsData(guardianData)
       : [];
-    const newsFromNYT = nytData ? structureNewsData(nytData) : [];
+    const newsFromNYT = (filters.sources.includes("nyt") && nytData) ? structureNewsData(nytData) : [];
 
     return [...newsFromAPI, ...newsFromGuardian, ...newsFromNYT];
-  }, [newsAPIData, guardianData, nytData]);
+  }, [newsAPIData, guardianData, nytData, filters.sources]);
 
   useEffect(() => {
     debounce(() => {
