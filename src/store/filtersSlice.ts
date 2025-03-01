@@ -1,16 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {format} from "date-fns";
+import {format, set} from "date-fns";
 export interface FiltersState {
   keyword: string;
   category: string;
   dateFrom:string;
   dateTo:string;
   sources: string[];
+  isPersonalized?:boolean;
 }
 
 const initialState: FiltersState = {
   keyword: '',
   category: '',
+  isPersonalized: false,
   sources: ['newsAPI', 'guardian', 'nyt'],
   dateFrom: format(new Date().toISOString(), "yyyy-MM-dd"),
   dateTo: format(new Date().toISOString(), "yyyy-MM-dd"),
@@ -35,6 +37,9 @@ const filtersSlice = createSlice({
     setSources(state, action: PayloadAction<string[]>) {
       state.sources = action.payload;
     },
+    setPersonalized(state, action: PayloadAction<boolean>) {
+      state.isPersonalized = action.payload;
+    },
     clearFilters(state) {
       state.keyword = '';
       state.category = '';
@@ -45,5 +50,5 @@ const filtersSlice = createSlice({
   },
 });
 
-export const { setKeyword, setCategory, setSources, setDateFrom, setDateTo, clearFilters } = filtersSlice.actions;
+export const { setKeyword, setCategory, setSources, setPersonalized, setDateFrom, setDateTo, clearFilters } = filtersSlice.actions;
 export default filtersSlice.reducer;

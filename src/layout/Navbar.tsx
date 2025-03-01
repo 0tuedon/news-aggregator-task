@@ -16,6 +16,7 @@ import {
 import FilterMenuIcon from "../components/icons/FilterMenuIcon";
 import { formatDate } from "date-fns";
 import { allSources, categoryMapping } from "../utils/data";
+import UserPreference from "./UserPreference";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -132,6 +133,13 @@ const Navbar = () => {
               ))}
             </div>
           </div>
+
+          {/* User Preferences */}
+
+              <div className="drawer-content__preferences">
+                <h3>Preferences</h3>
+                  <UserPreference />
+              </div>
         </div>
       </aside>
     </>
