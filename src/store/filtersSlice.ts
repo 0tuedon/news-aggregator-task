@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {format, set} from "date-fns";
+import {format} from "date-fns";
 export interface FiltersState {
   keyword: string;
   category: string;

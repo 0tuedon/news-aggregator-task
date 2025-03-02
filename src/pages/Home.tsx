@@ -56,9 +56,11 @@ const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
 
   // Debounced query update
   const debouncedQueryUpdate = useCallback(
-    debounce((newQuery: FiltersState) => {
-      setCurrentQuery({ query: newQuery, userPreferences });
-    }, 1000),
+    (newQuery: FiltersState) => {
+      debounce(() => {
+        setCurrentQuery({ query: newQuery, userPreferences });
+      }, 1000)();
+    },
     [userPreferences]
   );
 
