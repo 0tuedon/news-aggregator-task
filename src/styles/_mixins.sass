@@ -1,0 +1,16 @@
+=responsiveness($breakpoint)
+  @if $breakpoint == medium
+    @media (min-width: 768px)
+      @content
+  @else if $breakpoint == large
+    @media (min-width: 1024px)
+      @content
+  @else if $breakpoint == xlarge
+    @media (min-width: 1200px)
+      @content
+  @else if $breakpoint == 2xlarge
+    @media (min-width: 1530px)
+      @content
+  @else
+    // Default is small screens (mobile)
+    @content

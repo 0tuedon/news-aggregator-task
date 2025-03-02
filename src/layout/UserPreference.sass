@@ -1,0 +1,68 @@
+@use '../styles/variables' as *
+@use '../styles/mixins' as *
+
+
+.preferences
+    display: flex
+    flex-direction: column
+    gap: 24px
+    max-height: 100%
+    overflow-y: auto
+    &-header
+        display: flex
+        flex-direction: column
+        gap: 16px
+        &__text
+            font-size: 1.5rem
+            font-family: $font-family-secondary
+            font-weight: 500
+    &-content
+        display: flex
+        flex-direction: column
+        gap:24px
+        
+        &__fields
+            display: flex
+            flex-direction: column
+            gap: 8px
+            label
+                font-family: $font-family-primary
+                font-size: 0.875rem
+        &__field-input
+            height: 48px
+            border: none
+            color: white
+            width: 100%
+            padding: 0px 15px
+            border-radius: 8px
+            background-color: $dark_100
+            &::placeholder
+                color: $light_gray_300
+            &:focus
+                outline: none
+        &__field-tag
+            display: flex
+            align-items: center
+            gap: 4px
+            background-color: $dark_100
+            max-width: max-content
+            padding: 4px
+            color: white
+            font-size: 0.875rem
+            border-radius: 4px
+            button
+                color: $dark_100
+                border: none
+                background-color: transparent
+                padding: 0px
+                display: flex
+                align-items: center
+                cursor: pointer
+
+.ReactTags__selected
+    display: flex
+    padding-top: 8px
+    flex-wrap: wrap
+    gap: 8px
+
+    

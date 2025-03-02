@@ -33,3 +33,14 @@ blockquote:before, blockquote:after, q:before, q:after
 table
   border-collapse: collapse
   border-spacing: 0
+
+// Hide scrollbar for Webkit browsers (Chrome, Safari)
+.hide-scrollbar
+  &::-webkit-scrollbar
+    display: none
+
+  // Hide scrollbar in Firefox
+  scrollbar-width: none
+
+  // Hide scrollbar in Internet Explorer and Edge
+  -ms-overflow-style: none

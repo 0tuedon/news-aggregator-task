@@ -1,0 +1,38 @@
+@use '../styles/variables' as *
+@use '../styles/mixins' as *
+    
+.news
+    display: flex
+    padding: 64px 16px
+    flex-direction: column
+    gap: 45px
+    max-width: $gutter
+    width: 100%
+    margin: 0 auto
+    &-header
+        display: flex
+        justify-content: space-between
+        align-items: center
+        font-size: 1.75rem
+        color: white;
+        font-family: $font-family-secondary
+
+        &__customize
+            display: flex
+            align-items: center
+            max-width: max-content
+            padding: 8px 12px
+            font-size: 1.125rem
+            gap: 9px
+            color:$blue_200
+            border: none
+            font-family: $font-family-primary
+            background-color: transparent;
+            border-radius: 24px
+            cursor: pointer
+            +responsiveness(medium)
+                border: 1px solid $light_gray_400
+            span
+                display: none
+                +responsiveness(medium)
+                    display: inline-block

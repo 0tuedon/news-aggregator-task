@@ -29,10 +29,10 @@ Ensure you have the following installed on your machine:
 docker build -t news-aggregator .
 ```
 
-> after it's done 
+> after it's done, run the following command to expose port 3000 and run a container
 
 ```bash
-docker run --name news-aggregator news-aggregator
+docker run --name news-aggregator -p 3000:3000 news-aggregator
 ```
 
 You can now access the project at `http://localhost:3000`.
