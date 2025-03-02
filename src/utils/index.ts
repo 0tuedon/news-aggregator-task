@@ -145,7 +145,7 @@ export const buildAPIQuery = (
       // Add date range
       if (query.dateFrom) url += `&from-date=${query.dateFrom}`;
       if (query.dateTo) url += `&to-date=${query.dateTo}`;
-      if (!isForYouPage) {
+      if (!isForYouPage && mappedCategory) {
         url += `&section=${mappedCategory}`;
       }
       if (isForYouPage && userPreferences.categories.length) {
@@ -165,7 +165,7 @@ export const buildAPIQuery = (
         url += `&begin_date=${query.dateFrom.replace(/-/g, "")}`;
       if (query.dateTo) url += `&end_date=${query.dateTo.replace(/-/g, "")}`;
 
-      if (!isForYouPage) {
+      if (!isForYouPage && mappedCategory) {
         url += `&fq=section_name:${mappedCategory}`;
       }
       // Apply user preferences if on "/for-you" page
