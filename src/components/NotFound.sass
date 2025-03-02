@@ -1,0 +1,39 @@
+@use '../styles/variables' as *
+@use '../styles/mixins' as *
+
+.not-found
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    height: calc( 100dvh - 119px  )
+    width: 100%
+    gap: 24px
+    &__content
+        display: flex
+        flex-direction: column
+        gap: 16px
+        align-items: center
+        h1
+            font-size: 2.25rem
+            color: white
+            font-family: $font-family-secondary
+        a
+            display: flex
+            align-items: center
+            gap: 8px
+            font-size: 1.125rem
+            color: $blue_200
+            font-family: $font-family-primary
+            text-decoration: none
+            &:hover
+                text-decoration: underline
+    &__img
+        display: flex
+        justify-content: center
+        img
+            width: 100%
+            max-width: 400px
+            height: auto
+            border-radius: 4px
+       

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {format, set} from "date-fns";
+import {format} from "date-fns";
 export interface FiltersState {
   keyword: string;
   category: string;
@@ -14,8 +14,8 @@ const initialState: FiltersState = {
   category: '',
   isPersonalized: false,
   sources: ['newsAPI', 'guardian', 'nyt'],
-  dateFrom: format(new Date().toISOString(), "yyyy-MM-dd"),
-  dateTo: format(new Date().toISOString(), "yyyy-MM-dd"),
+  dateFrom: "",
+  dateTo: "",
 };
 
 const filtersSlice = createSlice({
