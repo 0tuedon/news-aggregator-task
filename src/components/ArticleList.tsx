@@ -5,7 +5,6 @@ import SingleArticles from "./SingleArticles";
 const ArticleList = ({ allNews }: { allNews: News[] }) => {
   return (
     <div className="articles">
-      <h2>Articles</h2>
       <div className="article-list">
         {/* Map over the articles and display them */}
         {allNews.map((article) => (

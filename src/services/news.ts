@@ -3,7 +3,6 @@ import { GuardianType, NewsAPIType, NYTAPIType } from "../types";
 import { FiltersState } from "../store/filtersSlice";
 import { buildAPIQuery } from "../utils";
 import { UserPreferencesState } from "../store/userPreferenceSlice";
-import { use } from "react";
 
 export type NewsQuery = {query:FiltersState, userPreferences:UserPreferencesState }
 export const newsAPI = createApi({

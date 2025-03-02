@@ -85,7 +85,8 @@ export const buildAPIQuery = (
   let apiKey = "";
   let url = "";
 
-  const isForYouPage = typeof window !== "undefined" && window.location.pathname === "/for-you";
+  const isForYouPage =
+    typeof window !== "undefined" && window.location.pathname === "/for-you";
 
   // Build mapped category from query
   const mappedCategory = query.category
@@ -106,10 +107,14 @@ export const buildAPIQuery = (
       // Apply user preferences if on "/for-you" page
       if (isForYouPage) {
         if (userPreferences.authors.length) {
-          url += `&authors=${userPreferences.authors.map(encodeURIComponent).join(",")}`;
+          url += `&authors=${userPreferences.authors
+            .map(encodeURIComponent)
+            .join(",")}`;
         }
         if (userPreferences.categories.length) {
-          url += `&category=${userPreferences.categories.map(encodeURIComponent).join(",")}`;
+          url += `&category=${userPreferences.categories
+            .map(encodeURIComponent)
+            .join(",")}`;
         }
       }
       break;
@@ -123,7 +128,9 @@ export const buildAPIQuery = (
       if (isForYouPage) {
         let authorsQuery = "";
         if (userPreferences.authors.length) {
-          authorsQuery = userPreferences.authors.map(encodeURIComponent).join(" OR ");
+          authorsQuery = userPreferences.authors
+            .map(encodeURIComponent)
+            .join(" OR ");
         }
 
         if (query.keyword && authorsQuery) {
@@ -138,10 +145,13 @@ export const buildAPIQuery = (
       // Add date range
       if (query.dateFrom) url += `&from-date=${query.dateFrom}`;
       if (query.dateTo) url += `&to-date=${query.dateTo}`;
-
-      
+      if (!isForYouPage && mappedCategory) {
+        url += `&section=${mappedCategory}`;
+      }
       if (isForYouPage && userPreferences.categories.length) {
-        url += `&section=${userPreferences.categories.map(encodeURIComponent).join(",")}`;
+        url += `&section=${userPreferences.categories
+          .map(encodeURIComponent)
+          .join(",")}`;
       }
       break;
 
@@ -151,16 +161,24 @@ export const buildAPIQuery = (
       url = `${baseURL}articlesearch.json?${apiKey}`;
 
       if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
-      if (query.dateFrom) url += `&begin_date=${query.dateFrom.replace(/-/g, "")}`;
+      if (query.dateFrom)
+        url += `&begin_date=${query.dateFrom.replace(/-/g, "")}`;
       if (query.dateTo) url += `&end_date=${query.dateTo.replace(/-/g, "")}`;
 
+      if (!isForYouPage && mappedCategory) {
+        url += `&fq=section_name:${mappedCategory}`;
+      }
       // Apply user preferences if on "/for-you" page
       if (isForYouPage) {
         if (userPreferences.authors.length) {
-          url += `&fq=byline:(${userPreferences.authors.map(encodeURIComponent).join(",")})`;
+          url += `&fq=byline:(${userPreferences.authors
+            .map(encodeURIComponent)
+            .join(",")})`;
         }
         if (userPreferences.categories.length) {
-          url += `&fq=section_name:(${userPreferences.categories.map(encodeURIComponent).join(",")})`;
+          url += `&fq=section_name:(${userPreferences.categories
+            .map(encodeURIComponent)
+            .join(",")})`;
         }
       }
       break;
@@ -168,4 +186,3 @@ export const buildAPIQuery = (
 
   return url;
 };
-

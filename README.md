@@ -23,16 +23,22 @@ Ensure you have the following installed on your machine:
 
 ## Docker Container Setup
 
-> to build base image for this project run the following command
+> to build the docker image and run this project for the first time
 
 ```bash
-docker build -t news-aggregator .
+docker compose up --build
 ```
 
-> after it's done 
+> if you had ran the above command before then
 
 ```bash
-docker run --name news-aggregator news-aggregator
+docker compose up -d # -d to run it in detach mode(which means it won't show those logs)
 ```
 
 You can now access the project at `http://localhost:3000`.
+
+> Run the following command to stop the container
+
+```bash
+docker compose down
+```
