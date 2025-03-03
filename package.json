@@ -15,6 +15,7 @@
     "@types/react-dom": "^19.0.4",
     "axios": "^1.8.1",
     "date-fns": "^4.1.0",
+    "jest": "^27.5.1",
     "react": "^19.0.0",
     "react-datepicker": "^8.1.0",
     "react-dom": "^19.0.0",
@@ -29,7 +30,9 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@types/redux-mock-store": "^1.5.0",
     "@types/redux-persist": "^4.0.0",
+    "redux-mock-store": "^1.5.5",
     "sass-loader": "^13.3.2"
   },
   "scripts": {

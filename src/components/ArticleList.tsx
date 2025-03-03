@@ -1,14 +1,14 @@
 import { News } from "../types";
 import "./ArticleList.sass";
-import SingleArticles from "./SingleArticles";
+import SingleArticle from "./SingleArticle";
 
 const ArticleList = ({ allNews }: { allNews: News[] }) => {
   return (
-    <div className="articles">
+    <div className="articles" data-testid="article-list">
       <div className="article-list">
         {/* Map over the articles and display them */}
         {allNews.map((article) => (
-          <SingleArticles key={article.url} {...article} />
+          <SingleArticle data-testid="single-article"  key={article.url} {...article} />
         ))}
       </div>
     </div>

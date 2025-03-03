@@ -16,7 +16,8 @@ const FilterDrawer = () => {
   const dispatch = useDispatch();
   const dateFrom = useSelector((state: RootState) => state.filters.dateFrom);
   const dateTo = useSelector((state: RootState) => state.filters.dateTo);
-  const sources = useSelector((state: RootState) => state.filters.sources) || [];
+  const sources =
+    useSelector((state: RootState) => state.filters.sources) || [];
   const category = useSelector((state: RootState) => state.filters.category);
 
   // Helper function to prevent future dates and enforce constraints
@@ -24,12 +25,12 @@ const FilterDrawer = () => {
     if (!date) return;
     let startDate = new Date(dateFrom || new Date());
     const today = new Date();
-    let selectedDate = date > today ? today : date; 
+    let selectedDate = date > today ? today : date;
     let formattedDate = format(selectedDate, "yyyy-MM-dd");
 
     if (range === "end") {
       if (selectedDate < new Date(startDate)) {
-        dispatch(setDateFrom(formattedDate)); 
+        dispatch(setDateFrom(formattedDate));
       }
       dispatch(setDateTo(formattedDate));
     } else {
@@ -51,12 +52,16 @@ const FilterDrawer = () => {
   };
 
   return (
-    <div className="filter-content__body">
+    <div data-testid="filters-container"  className="filter-content__body">
       <div className="filter-content__header">
         <h2>Filters</h2>
-          <button className="filter-content__clear" onClick={() => dispatch(clearFilters())}>
-            Reset Filters
-          </button>
+        <button
+          data-testid="reset-filter"
+          className="filter-content__clear"
+          onClick={() => dispatch(clearFilters())}
+        >
+          Reset Filters
+        </button>
       </div>
       <div className="filter-content__filter">
         <label htmlFor="dateFrom">Date From</label>
@@ -102,13 +107,14 @@ const FilterDrawer = () => {
           <div key={source.value}>
             <input
               type="checkbox"
+              data-testid={source.value}
               id={source.value}
               name={source.name}
               value={source.value}
               onChange={handleCheckboxChange}
-              checked={sources.includes(source.value)} // Ensure sources is always an array
+              checked={sources.includes(source.value)} 
             />
-            <label htmlFor={source.value}>{source.name}</label>
+            <label  htmlFor={source.value}>{source.name}</label>
           </div>
         ))}
       </div>
