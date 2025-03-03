@@ -4,7 +4,7 @@ import { FiltersState } from "../store/filtersSlice";
 import { buildAPIQuery } from "../utils";
 import { UserPreferencesState } from "../store/userPreferenceSlice";
 
-export type NewsQuery = {query:FiltersState, userPreferences:UserPreferencesState }
+export type NewsQuery = {query:FiltersState, userPreferences:UserPreferencesState, page:number }
 export const newsAPI = createApi({
   reducerPath: "newsAPI",
   baseQuery: fetchBaseQuery({ baseUrl: "" }), // will override the base URL for each endpoint
