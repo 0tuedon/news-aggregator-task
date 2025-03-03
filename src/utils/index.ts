@@ -79,7 +79,8 @@ const NYT_BASE_URL = `https://api.nytimes.com/svc/search/v2/`;
 export const buildAPIQuery = (
   query: FiltersState,
   source: "newsAPI" | "guardian" | "nyt",
-  userPreferences: UserPreferencesState
+  userPreferences: UserPreferencesState,
+  page: number = 1
 ): string => {
   let baseURL = "";
   let apiKey = "";
@@ -88,7 +89,6 @@ export const buildAPIQuery = (
   const isForYouPage =
     typeof window !== "undefined" && window.location.pathname === "/for-you";
 
-  // Build mapped category from query
   const mappedCategory = query.category
     ? categoryMapping[query.category as keyof typeof categoryMapping]?.[source]
     : null;
@@ -97,14 +97,13 @@ export const buildAPIQuery = (
     case "newsAPI":
       baseURL = NEWS_API_BASE_URL;
       apiKey = `apiKey=${NEWS_API}`;
-      url = `${baseURL}top-headlines?country=us&${apiKey}`;
+      url = `${baseURL}top-headlines?country=us&${apiKey}&page=${page}`;
 
       if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
       if (query.dateFrom) url += `&from=${query.dateFrom}`;
       if (query.dateTo) url += `&to=${query.dateTo}`;
       if (mappedCategory) url += `&category=${mappedCategory}`;
 
-      // Apply user preferences if on "/for-you" page
       if (isForYouPage) {
         if (userPreferences.authors.length) {
           url += `&authors=${userPreferences.authors
@@ -122,9 +121,8 @@ export const buildAPIQuery = (
     case "guardian":
       baseURL = GUARDIAN_BASE_URL;
       apiKey = `api-key=${GUARDIAN_API}`;
-      url = `${baseURL}search?${apiKey}`;
+      url = `${baseURL}search?${apiKey}&page=${page}`; // <-- Added page
 
-      // Combine keyword and authors for Guardian (if on "/for-you" page)
       if (isForYouPage) {
         let authorsQuery = "";
         if (userPreferences.authors.length) {
@@ -142,7 +140,6 @@ export const buildAPIQuery = (
         }
       }
 
-      // Add date range
       if (query.dateFrom) url += `&from-date=${query.dateFrom}`;
       if (query.dateTo) url += `&to-date=${query.dateTo}`;
       if (!isForYouPage && mappedCategory) {
@@ -158,7 +155,7 @@ export const buildAPIQuery = (
     case "nyt":
       baseURL = NYT_BASE_URL;
       apiKey = `api-key=${NYT_API}`;
-      url = `${baseURL}articlesearch.json?${apiKey}`;
+      url = `${baseURL}articlesearch.json?${apiKey}&page=${page}`; // <-- Added page
 
       if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
       if (query.dateFrom)
@@ -168,7 +165,6 @@ export const buildAPIQuery = (
       if (!isForYouPage && mappedCategory) {
         url += `&fq=section_name:${mappedCategory}`;
       }
-      // Apply user preferences if on "/for-you" page
       if (isForYouPage) {
         if (userPreferences.authors.length) {
           url += `&fq=byline:(${userPreferences.authors

@@ -1,6 +1,6 @@
 import "./Home.sass";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
 import {
@@ -8,7 +8,7 @@ import {
   useGetFromNewsAPIQuery,
   useGetFromNYTAPIQuery,
 } from "../services";
-import { FiltersState, setPersonalized } from "../store/filtersSlice";
+import { setPersonalized } from "../store/filtersSlice";
 import { debounce, structureNewsData } from "../utils";
 import ArticleList from "../components/ArticleList";
 import Loader from "../components/Loader";
@@ -31,30 +31,28 @@ const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
   const [debouncedKeyword, setDebouncedKeyword] = useState(filters.keyword);
   const [isFetching, setIsFetching] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [allNews, setAllNews] = useState<any[]>([]);
 
   const handleDrawerOnClick = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-  // Debounce only keyword updates
-  const debounceKeywordUpdate = useCallback(
-    debounce((newKeyword: string) => {
-      setDebouncedKeyword(newKeyword);
-    }, 500),
-    []
-  );
+  const debounceKeywordUpdate = debounce((newKeyword: string) => {
+    setDebouncedKeyword(newKeyword);
+  }, 500);
 
   useEffect(() => {
     debounceKeywordUpdate(filters.keyword);
-  }, [filters.keyword, debounceKeywordUpdate]);
+  }, [filters.keyword]);
 
-  // Update currentQuery when filters change
   useEffect(() => {
-    setIsFetching(true); // Show loader immediately
+    setIsFetching(true);
     setCurrentQuery({
       query: { ...filters, keyword: debouncedKeyword },
       userPreferences,
     });
+    setPage(1); // Reset pagination when filters change
   }, [
     filters.category,
     filters.sources,
@@ -65,33 +63,70 @@ const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
   ]);
 
   const { data: newsAPIData, isFetching: fetchingNewsAPI } =
-    useGetFromNewsAPIQuery(currentQuery);
+    useGetFromNewsAPIQuery({ ...currentQuery, page });
   const { data: guardianData, isFetching: fetchingGuardian } =
-    useGetFromGuardianAPIQuery(currentQuery);
+    useGetFromGuardianAPIQuery({ ...currentQuery, page });
   const { data: nytData, isFetching: fetchingNYT } =
-    useGetFromNYTAPIQuery(currentQuery);
+    useGetFromNYTAPIQuery({ ...currentQuery, page });
+
+  const isForYouPage =
+    typeof window !== "undefined" && window.location.pathname === "/for-you";
 
   useEffect(() => {
     if (!fetchingNewsAPI && !fetchingGuardian && !fetchingNYT) {
-      setIsFetching(false); // Hide loader when all requests complete
+      setIsFetching(false);
     }
   }, [fetchingNewsAPI, fetchingGuardian, fetchingNYT]);
 
-  // Combine all news data
-  const allNews = useMemo(() => {
-    return [
-      ...(newsAPIData ? structureNewsData(newsAPIData) : []),
-      ...(guardianData ? structureNewsData(guardianData) : []),
-      ...(nytData ? structureNewsData(nytData) : []),
-    ].sort(
-      (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  // This useEffect will update the allNews state with fetched data
+  useEffect(() => {
+    const isSourceAllowed = (type: string) => {
+      if (isForYouPage && userPreferences.sources.length) {
+        return userPreferences.sources.includes(type);
+      } else {
+        return filters.sources.includes(type);
+      }
+    };
+
+    const newsFromAPI =
+      isSourceAllowed("newsAPI") && newsAPIData
+        ? structureNewsData(newsAPIData)
+        : [];
+    const newsFromGuardian =
+      isSourceAllowed("guardian") && guardianData
+        ? structureNewsData(guardianData)
+        : [];
+    const newsFromNYT =
+      isSourceAllowed("nyt") && nytData
+        ? structureNewsData(nytData)
+        : [];
+
+    const newNews = [...newsFromAPI, ...newsFromGuardian, ...newsFromNYT].sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
-  }, [newsAPIData, guardianData, nytData]);
+
+    if (page === 1) {
+      setAllNews(newNews); // Reset news when filters change or page is 1
+    } else {
+      setAllNews((prev) => [...prev, ...newNews]); // Append new news on subsequent pages
+    }
+  }, [
+    newsAPIData,
+    guardianData,
+    nytData,
+    filters.sources,
+    userPreferences.sources,
+    isForYouPage,
+    page,
+  ]);
 
   useEffect(() => {
     dispatch(setPersonalized(!!isPersonalized));
   }, [isPersonalized, dispatch]);
+
+  const loadMore = () => {
+    setPage((prev) => prev + 1); // Increment page number for fetching next page
+  };
 
   return (
     <>
@@ -105,7 +140,13 @@ const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
             <span>Filters</span>
           </button>
         </div>
-        {isFetching ? <Loader /> : <ArticleList allNews={allNews} />}
+        {isFetching && page === 1 ? <Loader /> : <ArticleList allNews={allNews} />}
+        {!isFetching && (<div className="load-more">
+          <button className="load-more__button" onClick={loadMore} disabled={isFetching}>
+              Load More
+          </button>
+        </div>)}
+       
       </div>
 
       <Wrapper drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}>
