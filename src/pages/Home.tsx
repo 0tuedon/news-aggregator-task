@@ -40,7 +40,7 @@ const HomePage = ({ isPersonalized }: { isPersonalized?: boolean }) => {
 
   const debounceKeywordUpdate = debounce((newKeyword: string) => {
     setDebouncedKeyword(newKeyword);
-  }, 500);
+  }, 1000);
 
   useEffect(() => {
     debounceKeywordUpdate(filters.keyword);
