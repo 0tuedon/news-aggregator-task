@@ -121,7 +121,7 @@ export const buildAPIQuery = (
     case "guardian":
       baseURL = GUARDIAN_BASE_URL;
       apiKey = `api-key=${GUARDIAN_API}`;
-      url = `${baseURL}search?${apiKey}&page=${page}`; // <-- Added page
+      url = `${baseURL}search?${apiKey}&page=${page}`;
 
       if (isForYouPage) {
         let authorsQuery = "";
@@ -130,7 +130,6 @@ export const buildAPIQuery = (
             .map(encodeURIComponent)
             .join(" OR ");
         }
-
         if (query.keyword && authorsQuery) {
           url += `&q=${encodeURIComponent(query.keyword)} AND ${authorsQuery}`;
         } else if (query.keyword) {
@@ -139,7 +138,9 @@ export const buildAPIQuery = (
           url += `&q=${authorsQuery}`;
         }
       }
-
+      if (!isForYouPage && query.keyword) {
+        url += `&q=${encodeURIComponent(query.keyword)}`;
+      }
       if (query.dateFrom) url += `&from-date=${query.dateFrom}`;
       if (query.dateTo) url += `&to-date=${query.dateTo}`;
       if (!isForYouPage && mappedCategory) {
@@ -155,7 +156,7 @@ export const buildAPIQuery = (
     case "nyt":
       baseURL = NYT_BASE_URL;
       apiKey = `api-key=${NYT_API}`;
-      url = `${baseURL}articlesearch.json?${apiKey}&page=${page}`; // <-- Added page
+      url = `${baseURL}articlesearch.json?${apiKey}&page=${page}`;
 
       if (query.keyword) url += `&q=${encodeURIComponent(query.keyword)}`;
       if (query.dateFrom)
