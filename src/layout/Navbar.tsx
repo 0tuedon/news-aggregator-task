@@ -1,19 +1,19 @@
 // Styles
 import "./Navbar.sass";
+
 // Packages
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { RiSettings3Line } from "react-icons/ri";
-//  Local Imports
+import { NavLink, useSearchParams } from "react-router";
+
+// Local Imports
 import { RootState } from "../store";
-import {
-  setCategory,
-  setKeyword,
-} from "../store/filtersSlice";
+import { setCategory, setKeyword } from "../store/filtersSlice";
 import { categoryMapping } from "../utils/data";
 import UserPreference from "./UserPreference";
-import { NavLink, useSearchParams } from "react-router";
 import Wrapper from "../components/drawer/Wrapper";
+import { debounce } from "../utils"; // Import debounce utility
 
 const Navbar = () => {
   let [searchParams] = useSearchParams();
@@ -21,21 +21,24 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const keyword = useSelector((state: RootState) => state.filters.keyword);
 
+  // Debounced function to update keyword
+  const debouncedSetKeyword = debounce((newKeyword: string) => {
+    dispatch(setKeyword(newKeyword));
+  }, 500); // 500ms delay
+
   const handleSearch: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     e.preventDefault();
-    dispatch(setKeyword(e.target.value));
+    debouncedSetKeyword(e.target.value);
   };
 
   const handleDrawerOnClick = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-
   const handleCategoryChange = (category: string) => {
     searchParams.set("categories", encodeURI(category));
     dispatch(setCategory(category));
   };
-
 
   return (
     <>
@@ -44,7 +47,7 @@ const Navbar = () => {
           <div className="navbar-up-container__search">
             <input
               type="text"
-              value={keyword}
+              defaultValue={keyword} // Use defaultValue instead of value to prevent re-renders
               placeholder="Search"
               onChange={handleSearch}
             />
