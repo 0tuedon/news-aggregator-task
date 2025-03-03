@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { News } from "../types";
 import { formatDistance } from "date-fns";
 
-const SingleArticles: FC<News> = (props) => {
+const SingleArticle: FC<News> = (props) => {
   const {
     title,
     imgLink,
@@ -21,7 +21,7 @@ const SingleArticles: FC<News> = (props) => {
   };
 
   return (
-    <a target="_blank" rel="noreferrer" href={url} className="article">
+    <a target="_blank" data-testid="single-article" rel="noreferrer" href={url} className="article">
       <div className="article-body">
         <img className="article-body-image" src={imageSrc} alt={title} onError={handleError} />
         <div className="article-body-content">
@@ -45,4 +45,4 @@ const SingleArticles: FC<News> = (props) => {
   );
 };
 
-export default SingleArticles;
+export default SingleArticle;
